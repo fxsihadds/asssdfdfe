@@ -1,17 +1,15 @@
 import time
 import os
-from helpers.s_captcha import user_captcha
+#from helpers.s_captcha import user_captcha
 import asyncio
 from typing import Callable, Union
 from functools import wraps
 from pyrogram.types import Message, CallbackQuery
 from pyrogram import enums
-from helpers.pylimitars import Ratelimiter
+#from helpers.pylimitars import Ratelimiter
 from time import perf_counter
 
 
-# Dictionary to store the last invocation time of each user
-last_command_time = {}
 
 # Ensure a Consistent event loop!
 def get_or_create_event_loop():
@@ -26,10 +24,13 @@ def get_or_create_event_loop():
 loop = get_or_create_event_loop()
 
 # Define a threshold for the time difference (e.g., 15 seconds)
-COMMAND_THRESHOLD = 15
+#COMMAND_THRESHOLD = 15
+
+# Dictionary to store the last invocation time of each user
+#last_command_time = {}
 
 
-async def time_limit(bot, cmd):
+"""async def time_limit(bot, cmd):
     try:
         user_id = cmd.from_user.id
         current_time = time.time()
@@ -46,7 +47,7 @@ async def time_limit(bot, cmd):
     except Exception as e:
         print(f"An error occurred: {e}")
         await cmd.reply_text('An error occurred while processing your request.')
-        return False
+        return False"""
 
 
 def create_task_for_user(func: Callable) -> Callable:
@@ -151,7 +152,7 @@ def get_time(func: Callable) -> Callable:
     return wrapper
 
 
-# Create an instance of Ratelimiter
+"""# Create an instance of Ratelimiter
 rate_limiter = Ratelimiter()
 
 
@@ -169,7 +170,7 @@ def ratelimiters(func: Callable) -> Callable:
         else:
             return await func(bot, cmd)
 
-    return wrapper
+    return wrapper"""
 
 
 

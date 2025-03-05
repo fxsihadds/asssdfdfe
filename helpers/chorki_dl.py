@@ -77,9 +77,12 @@ def corki_dl(url, bot, cmds):
     for header in headers:
         cmd.extend(["--header", header])
     cmd.extend(["--save-name", f"{id}", "-sv", "res=720"])
+
+
     try:
-        subprocess.run(cmd, shell=True)
+        subprocess.run(cmd, check=True)
+        
     except subprocess.CalledProcessError as e:
         print(f"Error: {e}")
-    else:
-        return f"{id}.mp4"
+
+    return f"{id}.mp4"

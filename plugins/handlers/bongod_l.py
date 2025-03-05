@@ -88,14 +88,14 @@ def bongo_url_extract_requests(url_input: str) -> str:
         url=f"https://api.bongo-solutions.com/ironman/api/v1/content/detail/{id}",
         headers=headers1,
     )
-    print(res.text)
+    #print(res.text)
     if "User is not authorized" in res.text:
         raise Exception(
             "This is A Rent a Buy Content, We are not Able to Download this type of Content"
         )
     name = res.json().get("title", "Unknown")
     link = extract_value(res.text, '"activeEncode":{"urls":{"hls":{"url":"', '"},')
-    print(link)
+    #print(link)
     ydl_opts = {
         "http_headers": {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
@@ -106,7 +106,7 @@ def bongo_url_extract_requests(url_input: str) -> str:
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(link, download=False)
         for format in info["formats"]:
-            print(format)
+            #print(format)
             if "height" in format and format["height"] == 720:
                 # print(f"Selected Format ID: {format['format_id']} {format['url']}")
                 return format["url"], name

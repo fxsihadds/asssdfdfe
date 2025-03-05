@@ -1,11 +1,10 @@
 import requests
 from pyrogram import Client, filters
-from helpers.timemanager import ratelimiters
+#from helpers.timemanager import ratelimiters
 
 
 
 @Client.on_message(filters.command("bin"))
-@ratelimiters
 async def cmds(_, cmd):
     try:
         BIN = cmd.text.split("/bin", 1)[1].strip()

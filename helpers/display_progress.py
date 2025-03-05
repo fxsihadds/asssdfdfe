@@ -2,7 +2,7 @@
 import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-import math, os, time, shutil, aiohttp
+import math, os, time, shutil
 
 
 class Translation(object):
@@ -48,7 +48,7 @@ async def progress_for_pyrogram(current, total, ud_type, message, filename, star
             #logger.info(str(e))
             pass
 
-async def ContentDisposition(url):
+"""async def ContentDisposition(url):
     session = aiohttp.ClientSession()
     filename = None
     async with session.get(url, timeout=3600) as response:
@@ -56,14 +56,14 @@ async def ContentDisposition(url):
             filename = response.headers["Content-Disposition"].split("filename=")[-1].replace("\"", "")
         filesize = int(response.headers["Content-Length"])
         await session.close()
-    return filename, humanbytes(filesize)
+    return filename, humanbytes(filesize)"""
 
-async def ContentLength(url):
+"""async def ContentLength(url):
     session = aiohttp.ClientSession()
     async with session.get(url, timeout=3600) as response:
         filesize = int(response.headers["Content-Length"])
         await session.close()
-    return humanbytes(filesize)
+    return humanbytes(filesize)"""
 
 def humanbytes(size):
     # https://stackoverflow.com/a/49361727/4723940

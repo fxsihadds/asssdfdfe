@@ -1,6 +1,6 @@
 # This is not Need to update!
 
-from helpers.timemanager import time_limit
+#from helpers.timemanager import time_limit
 from pyrogram import Client, filters
 from pyrogram.types import Message
 import requests

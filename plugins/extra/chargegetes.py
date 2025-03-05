@@ -3,7 +3,7 @@ import json
 from pyrogram import Client, filters
 from pyrogram.types import Message
 import random
-from helpers.timemanager import run_sync_in_thread, rate_limiter
+from helpers.timemanager import run_sync_in_thread
 
 # Create a session object
 session = requests.Session()

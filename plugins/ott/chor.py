@@ -5,7 +5,7 @@ from helpers.chorki_dl import corki_dl
 from helpers.display_progress import progress_for_pyrogram
 from helpers.c_video import get_video_duration, thumbnail_video
 from helpers.hoichoi_dl import hoichoi_dl
-from ..handlers.txt_to_voice import bongo_url_extract_requests
+from ..handlers.bongod_l import bongo_url_extract_requests
 from ..extra.testdlp import handle_user_request
 
 pattern = r"https?://(?:www\.)?(?:chorki\.com|bongobd\.com|hoichoi\.tv)\S*"

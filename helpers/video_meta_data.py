@@ -1,9 +1,7 @@
 import os
 import json
-from ffmpeg import probe
+import ffmpeg
 from pymediainfo import MediaInfo
-from pprint import pprint
-from moviepy.editor import VideoFileClip
 
 
 class META:
@@ -15,12 +13,14 @@ class META:
     def meta_data_extract(self):
         try:
             # Extract metadata from the file
-            result = probe(self.path)["streams"]
+            result = ffmpeg.probe(self.path)
+            streams = result.get("streams", [])
+            
             # Write metadata to a file in JSON format
             with open("result.txt", mode="a", encoding="utf-8") as data:
-                json.dump(result, data, indent=4)
+                json.dump(streams, data, indent=4)
                 data.write("\n")  # Add a newline for readability
-            return result
+            return streams
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
@@ -28,84 +28,71 @@ class META:
     def mediainfo_ext(self):
         media_info = MediaInfo.parse(self.path)
         for track in media_info.tracks:
-            if track.track_type == "Video":
-                return track.to_data()
-            elif track.track_type == "Audio":
+            if track.track_type in ["Video", "Audio"]:
                 return track.to_data()
         os.remove(self.path)
 
     def ext_audio(self):
         output_dir = "audio"
         output_file = os.path.join(output_dir, "output_audio.mp3")
-        # Create the output directory if it doesn't exist
         if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
+            os.makedirs(output_dir)
+        
         try:
-            clip = VideoFileClip(self.path)
-            # Write the audio file with the codec specified
-            clip.audio.write_audiofile(output_file, codec="libmp3lame", bitrate="320k")
-            clip.close()
+            # Extract audio using FFmpeg
+            (
+                ffmpeg
+                .input(self.path)
+                .output(output_file, acodec="libmp3lame", audio_bitrate="320k")
+                .run(overwrite_output=True)
+            )
             print(f"Audio extracted successfully: {output_file}")
-            #os.remove(self.path)
         except Exception as e:
             print(f"An error occurred: {e}")
             os.remove(self.path)
 
-
-
     def split_video(self, output1, output2):
-        # Load the video
-        video = VideoFileClip(self.path)
-
-        # Calculate the midpoint of the video
-        midpoint = video.duration / 2
-
-        # Split the video into two parts
-        first_half = video.subclip(0, midpoint)
-        second_half = video.subclip(midpoint, video.duration)
-
-        # Save the two parts
-        first_half.write_videofile(output1, codec="libx264", audio_codec="aac")
-        second_half.write_videofile(output2, codec="libx264", audio_codec="aac")
-
-        # Close the clips to free resources
-        video.close()
-        first_half.close()
-        second_half.close()
+        try:
+            # Get video duration
+            duration = float(ffmpeg.probe(self.path)['format']['duration'])
+            midpoint = duration / 2
+            
+            # Split video into two parts using FFmpeg
+            (
+                ffmpeg
+                .input(self.path, ss=0, t=midpoint)
+                .output(output1, vcodec="libx264", acodec="aac")
+                .run(overwrite_output=True)
+            )
+            
+            (
+                ffmpeg
+                .input(self.path, ss=midpoint)
+                .output(output2, vcodec="libx264", acodec="aac")
+                .run(overwrite_output=True)
+            )
+            print("Video split successfully.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
     def trim_video(self, output_path, start_time, end_time):
-        """
-        Trims a video between the specified start and end times and saves it to a new file.
-
-        Parameters:
-            input_path (str): Path to the input video file.
-            output_path (str): Path to save the trimmed video file.
-            start_time (float): Start time in seconds.
-            end_time (float): End time in seconds.
-
-        Returns:
-            None
-        """
         try:
-            # Load the video file
-            clip = VideoFileClip(self.path)
-            
-            # Ensure start and end times are within the video duration
-            if start_time < 0 or end_time > clip.duration or start_time >= end_time:
+            # Get video duration
+            duration = float(ffmpeg.probe(self.path)['format']['duration'])
+            if start_time < 0 or end_time > duration or start_time >= end_time:
                 raise ValueError("Invalid start_time or end_time.")
             
-            # Trim the video
-            trimmed_clip = clip.subclip(start_time, end_time)
-            
-            # Save the trimmed video to the output file
-            trimmed_clip.write_videofile(output_path, codec="libx264", audio_codec="aac")
-            
+            # Trim video using FFmpeg
+            (
+                ffmpeg
+                .input(self.path, ss=start_time, to=end_time)
+                .output(output_path, vcodec="libx264", acodec="aac")
+                .run(overwrite_output=True)
+            )
             print(f"Video trimmed successfully and saved to {output_path}.")
         except Exception as e:
             print(f"An error occurred: {e}")
-        finally:
-            # Clean up resources
-            clip.close()
+
 
 
 

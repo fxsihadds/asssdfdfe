@@ -1,9 +1,8 @@
 from pyrogram import Client, filters
-from helpers.timemanager import ratelimiters
+#from helpers.timemanager import ratelimiters
 
 
 @Client.on_message(filters.command("id", ["/", "."]))
-@ratelimiters
 async def userinfo_command(client: Client, message):
     if len(message.command) > 1:
         username = message.command[1]

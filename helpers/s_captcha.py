@@ -1,3 +1,5 @@
+"""
+pip install CaptchaGenerator
 from CaptchaGenerator.CaptchaGenerator import Captcha
 
 
@@ -13,3 +15,4 @@ async def user_captcha(bot, cmd):
         await cmd.reply_text("Captcha is Wrong!! ❌")
         await bot.delete_messages(chat_id=cmd.chat.id, message_ids=[CaptchaMath.id, GetSolve.id, cmd.id], revoke=True)
         return False
+"""

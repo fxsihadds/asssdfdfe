@@ -7,7 +7,6 @@ from random import randint
 import re
 import subprocess
 
-# সেশন তৈরি
 session = requests.Session()
 
 
@@ -48,12 +47,11 @@ def bongo_url_extract_requests(url_input: str) -> str:
     # ডাটা (বডি) সেট করা
     data = {
         "grant_type": "refresh_token",
-        "refresh_token": "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI0NWRiZTZmZS1kZjJiLTQzNTktYWE4ZS1lODEyNjJmNmY1ZTIifQ.eyJleHAiOjE3NDI3MTEwMzEsImlhdCI6MTczOTY5NjY5MywianRpIjoiNGQ1YWU2YTMtODA4NS00M2U1LWI1YjEtZWUwODIzOTcwYmQ3IiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5ib25nb2JkLmNvbS9yZWFsbXMvYm9uZ28iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmJvbmdvYmQuY29tL3JlYWxtcy9ib25nbyIsInN1YiI6ImYyZDU5NTVmLTZjYWYtNDQzYS1hNjI5LTIxZTRiZGRkMGE3MSIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJvdHBsb2dpbiIsInNpZCI6IjUyN2Q3Y2Q1LTEzOGEtNGM1Yy04NjVmLWJjN2NhZWYzMzIwYiIsInNjb3BlIjoib3BlbmlkIGJhc2ljIn0.4CNfqMba7P6uyITC9N1tjJFJOLp_FUuwadbS3hCMdrN_7vfzsNkx4Akg-FZpt9anBzBSWK74V6YDDtJ-n-q8Rg",  # এখানে আপনার আসল রিফ্রেশ টোকেন দিন
+        "refresh_token": "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI0NWRiZTZmZS1kZjJiLTQzNTktYWE4ZS1lODEyNjJmNmY1ZTIifQ.eyJleHAiOjE3NDI3MTEwMzEsImlhdCI6MTczOTY5NjY5MywianRpIjoiNGQ1YWU2YTMtODA4NS00M2U1LWI1YjEtZWUwODIzOTcwYmQ3IiwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5ib25nb2JkLmNvbS9yZWFsbXMvYm9uZ28iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmJvbmdvYmQuY29tL3JlYWxtcy9ib25nbyIsInN1YiI6ImYyZDU5NTVmLTZjYWYtNDQzYS1hNjI5LTIxZTRiZGRkMGE3MSIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJvdHBsb2dpbiIsInNpZCI6IjUyN2Q3Y2Q1LTEzOGEtNGM1Yy04NjVmLWJjN2NhZWYzMzIwYiIsInNjb3BlIjoib3BlbmlkIGJhc2ljIn0.4CNfqMba7P6uyITC9N1tjJFJOLp_FUuwadbS3hCMdrN_7vfzsNkx4Akg-FZpt9anBzBSWK74V6YDDtJ-n-q8Rg",
         "client_id": "otplogin",
         "client_secret": "hqLikcYccIpw02KmKNMSfXFloLvcVPPw",
     }
 
-    # POST অনুরোধ পাঠানো
     response = session.post(url, headers=headers, data=data)
     # print(response.text)
     access_token = response.json()["access_token"]
@@ -80,7 +78,7 @@ def bongo_url_extract_requests(url_input: str) -> str:
         url=f"https://api.bongo-solutions.com/ironman/api/v1/content/detail/{id}",
         headers=headers1,
     )
-    # print(res.text)
+    #print(res.text)
     if "User is not authorized" in res.text:
         raise Exception(
             "This is A Rent a Buy Content, We are not Able to Download this type of Content"
@@ -90,7 +88,26 @@ def bongo_url_extract_requests(url_input: str) -> str:
     link = extract_value(res.text, '"activeEncode":{"urls":{"hls":{"url":"', '"},')
     drm_id = extract_value(res.text, '{"type":"DRM","drm_id":"', '"}}')
     if not drm_id:
-        return 'This Video is not DRM Protected'
+        command = [
+    "N_m3u8DL-RE", 
+    f"{link}", 
+    '-sv','res=720',
+    "-M", "format=mp4",
+]
+        headers = [
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
+            "Origin: https://bongobd.com",
+            "Referer: https://bongobd.com/"
+        ]
+        for header in headers:
+                command.extend(["--header", header])
+        try:
+            result = subprocess.run(command, shell=True)
+            print("Command Output:", result.stdout)  
+            print("Command Error:", result.stderr) 
+        except subprocess.CalledProcessError as e:
+            print(f"Error occurred: {e}") 
+        return 
     print(link)
     ydl_opts = {
         "http_headers": {
@@ -102,7 +119,7 @@ def bongo_url_extract_requests(url_input: str) -> str:
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(link, download=False)
         for format in info["formats"]:
-            # print(format)
+            #print(format)
             if "height" in format and format["height"] == 720:
                 # print(f"Selected Format ID: {format['format_id']} {format['url']}")
                 headers = {
@@ -201,11 +218,8 @@ def bongo_url_extract_requests(url_input: str) -> str:
                 cmd = [
                     "C:/Users/FxSihad/Downloads/Compressed/M.exe",
                     mpd,
-                    "--key",
-                    f"{key_kid}",
-                    "--auto-select",
-                    "-sv",  # Select video stream option
-                    "720p",  # Select only 720p resolution
+                    "--key",f"{key_kid}",
+                    "-sv", "res=720p",  # Select only 720p resolution
                 ]
 
                 cmd.extend(["--save-name", "video", "-M", "format=mp4"])
@@ -217,5 +231,5 @@ def bongo_url_extract_requests(url_input: str) -> str:
 
 
 bongo_url_extract_requests(
-    "https://bongobd.com/subscribe?contentUuid=fnomPBHmuck"
+    "https://bongobd.com/watch/mCcw71oUZSJ?contentUuid=73a2acbc-c82a-4b42-a8df-ac18cc2db9be"
 )
