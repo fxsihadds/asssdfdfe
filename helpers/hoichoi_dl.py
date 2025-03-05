@@ -15,7 +15,7 @@ proxies = {
 
 session = requests.Session()
 scraper = cloudscraper.create_scraper(sess=session)
-
+scraper.proxies.update(proxies)
 
 def extract_value(source, left, right):
     """Extract value from the source based on delimiters"""
@@ -85,6 +85,7 @@ def hoichoi_dl(inp_url: str, bot, status):
 
     try:
         res = scraper.get(inp_url, headers=headers1)
+        print(res.text)
         res.raise_for_status()
         video_id = extract_value(res.text, '"contentData":[{"gist":{"id":"', '",')
         if not video_id:
@@ -119,7 +120,7 @@ def hoichoi_dl(inp_url: str, bot, status):
         response = scraper.get(
             "https://prod-api.viewlift.com/entitlement/video/status",
             params=params,
-            headers=headers,
+            headers=headers
         )
         response.raise_for_status()
         url_data = extract_value(response.text, '"widevine":', "},")
