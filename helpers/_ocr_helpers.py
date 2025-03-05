@@ -19,7 +19,20 @@ def sub_images(bot, status, video_path, tmp_dir):
             os.mkdir(tmp_dir)
 
         startTime = time.time()
-        subprocess.run([
+        command = [
+    "VideoSubFinderCli",
+    "-c",
+    "-r",
+    "-i", f"{video_path}",
+    "-o", f"{tmp_dir}",
+    "-te", "0.27",
+    "-be", "0.02",
+    "-le", "0.05",
+    "-re", "0.95",
+    "-nthr", "4"
+]
+        subprocess.run(command, shell=True)
+        """subprocess.run([
             "C:/Users/Shovo/Downloads/VideoSubFinder_5.40_x64/Release_x64/VideoSubFinderWXW.exe",
             "--clear_dirs",
             "--run_search",
@@ -30,7 +43,7 @@ def sub_images(bot, status, video_path, tmp_dir):
             "--num_ocr_threads", str(4),
             "--top_video_image_percent_end", str(0.25),
             "--bottom_video_image_percent_end", str(0.0)
-        ], capture_output=True)
+        ], capture_output=True)"""
 
         endTime = time.time()
         status.edit_text(f"Completed! Took {round(endTime - startTime)}s")
