@@ -5,8 +5,6 @@ git.pub
 BotClient.session
 .downloads/
 .download/
-*.ini
-config.ini
 Multi.log
 imagess
 your_download
