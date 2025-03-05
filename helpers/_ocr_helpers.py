@@ -2,7 +2,7 @@ import time
 import subprocess
 import os
 import zipfile
-from helpers.timemanager import create_task_for_user, run_sync_in_thread
+from helpers.timemanager import run_sync_in_thread
 import shutil
 
 
