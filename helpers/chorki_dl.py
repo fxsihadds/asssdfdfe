@@ -1,7 +1,7 @@
 import requests
 import subprocess
 from urllib.parse import urlparse
-
+from helpers.timemanager import run_sync_in_thread
 session = requests.Session()
 
 
@@ -14,7 +14,7 @@ def extract_value(source, left, right):
     except ValueError:
         return None
 
-
+@run_sync_in_thread
 def corki_dl(url, bot, cmds):
     parsed_url = urlparse(url)
     id = parsed_url.path.split("/")[-1]

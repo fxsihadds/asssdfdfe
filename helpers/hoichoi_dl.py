@@ -85,7 +85,7 @@ def hoichoi_dl(inp_url: str, bot, status):
 
     try:
         res = scraper.get(inp_url, headers=headers1)
-        print(res.text)
+        #print(res.text)
         res.raise_for_status()
         video_id = extract_value(res.text, '"contentData":[{"gist":{"id":"', '",')
         if not video_id:
@@ -111,7 +111,7 @@ def hoichoi_dl(inp_url: str, bot, status):
         "Sec-Fetch-Site": "cross-site",
     }
     params = {
-        "id": video_id,
+        "id": f"{video_id}",
         "deviceType": "web_browser",
         "contentConsumption": "web",
     }
@@ -124,8 +124,9 @@ def hoichoi_dl(inp_url: str, bot, status):
         )
         response.raise_for_status()
         url_data = extract_value(response.text, '"widevine":', "},")
-        url = extract_value(url_data, '"url":"', '"')
-        if not url:
+        value = extract_value(url_data, '"url":"', '"')
+        print(value)
+        if not value:
             raise ValueError("Video URL not found!")
     except requests.RequestException as e:
         status.edit_text(f"Error fetching video URL: {e}")
@@ -137,29 +138,13 @@ def hoichoi_dl(inp_url: str, bot, status):
     parsed_url = urlparse(inp_url)
     name = parsed_url.path.split("/")[-1]
 
-    command = [
-        "N_m3u8DL-RE",
-        f"{url}",
-        "--key",
-        "06096b2215a6463f951b6e687b87c0cf:ff66b86ebabe06b2f3301eb3601d9ad9",
-        "--decryption-engine",
-        "SHAKA_PACKAGER",
-        "-sv",
-        "res=720",
-        "-sa",
-        "best",
-        "--save-name",
-        f"{name}",
-        "-M",
-        "format=mp4",
-    ]
+    cmd = ["N_m3u8DL-RE", value]
+    cmd.extend(["--key", "06096b2215a6463f951b6e687b87c0cf:ff66b86ebabe06b2f3301eb3601d9ad9", "--decryption-engine", "SHAKA_PACKAGER", "--save-name", f"{name}",  "-sv", "res=720", "-sa", "best", "-M", "format=mp4"])
+
 
     try:
-        result = subprocess.run(command, shell=True, check=True)
-        if result.returncode == 0:
-            return f"{name}.mp4"
-        else:
-            raise RuntimeError("Download command failed!")
-    except (subprocess.CalledProcessError, RuntimeError) as e:
-        status.edit_text(f"Download error: {e}")
-        return
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+
+    return f"{name}.mp4"

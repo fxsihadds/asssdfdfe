@@ -262,18 +262,26 @@ async def cmd(client, callback_query):
             if not os.path.exists(user_folder):
                 os.makedirs(user_folder)
 
-            user_res = await client.ask(message.chat.id, "WRITE YOUR KEYWORD:✍")
+            user_res = await client.ask(
+                message.chat.id,
+                "WRITE YOUR KEYWORD (Single(Netflix)|Multiple(netflix<space>express)):✍",
+            )
             # Extract the text of the response
-            find_str = user_res.text
+            find_str = user_res.text.split()
             status = await message.reply_text("<b>⎚ `Processing...`</b>")
             await message.download(
                 file_name=file_path,
                 progress=progress_for_pyrogram,
                 progress_args=(STATUS_ID, status, file_name, start_time),
             )
-            await find_strings_from_txt(find_str, file_path, status, client)
+            if len(find_str) <= 1:
+                #print(str(find_str))
+                await find_strings_from_txt(str(find_str), file_path, status, client)
+            elif len(find_str) > 1:
+                for i in find_str:
+                    print(i)
+                    await find_strings_from_txt(i, file_path, status, client)
             os.remove(file_path)
-            # await callback_query.message.reply_text(f"Thank you, {user_name}!")
         elif response == "gscr":
             status = await callback_query.message.reply_text(
                 "<b>⎚ `Downloading...`</b>"
