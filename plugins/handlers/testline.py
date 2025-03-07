@@ -53,16 +53,22 @@ async def line_scraper(bot: Client, cmd: Message):
 
 @run_sync_in_thread_running_loop
 def find_strings_from_txt(find_str, file_path, status, bot):
-    status.edit_text("<b>⎚ `Extracting The Text File...`</b>")
+    
     output_file = f"{find_str} ulp.txt"
     try:
         start_time = perf_counter()
         # Using subprocess to run grep command with case insensitivity
-        grep_process = subprocess.Popen(
+        """grep_process = subprocess.Popen(
             ["grep", "-i", find_str, file_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             encoding="utf-8",
+        )"""
+        grep_process = subprocess.Popen(
+            ["findstr", "/I", find_str, file_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
         )
 
         output_lines, errors = grep_process.communicate()
@@ -77,8 +83,6 @@ def find_strings_from_txt(find_str, file_path, status, bot):
                     document=output_file,
                     caption=f"Took {end_time-start_time:.3f} seconds",
                 )
-                status.delete()
-                os.remove(file_path)
                 os.remove(output_file)
             else:
                 status.edit_text("Your Domain Or STR Not Found In Your Text File!")

@@ -264,7 +264,7 @@ async def cmd(client, callback_query):
 
             user_res = await client.ask(
                 message.chat.id,
-                "WRITE YOUR KEYWORD (Single(Netflix)|Multiple(netflix<space>express)):✍",
+                "Enter your keyword: (Single: e.g., Netflix | Multiple: e.g., Netflix Express): ✍",
             )
             # Extract the text of the response
             find_str = user_res.text.split()
@@ -274,14 +274,13 @@ async def cmd(client, callback_query):
                 progress=progress_for_pyrogram,
                 progress_args=(STATUS_ID, status, file_name, start_time),
             )
-            if len(find_str) <= 1:
-                #print(str(find_str))
-                await find_strings_from_txt(str(find_str), file_path, status, client)
-            elif len(find_str) > 1:
-                for i in find_str:
-                    print(i)
-                    await find_strings_from_txt(i, file_path, status, client)
+            await status.edit_text("<b>⎚ `Extracting The Text File...`</b>")
+            for i in find_str:
+                print(i)
+                await find_strings_from_txt(i, file_path, message, client)
+
             os.remove(file_path)
+            await status.delete()
         elif response == "gscr":
             status = await callback_query.message.reply_text(
                 "<b>⎚ `Downloading...`</b>"
