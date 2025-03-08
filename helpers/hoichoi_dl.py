@@ -56,6 +56,7 @@ def hoichoi_dl(inp_url: str, bot, status):
             params=params,
             headers=headers,
             json=json_data,
+            timeout=10
         )
         response.raise_for_status()
         data = response.json()
@@ -84,8 +85,8 @@ def hoichoi_dl(inp_url: str, bot, status):
     }
 
     try:
-        res = scraper.get(inp_url, headers=headers1)
-        #print(res.text)
+        res = scraper.get(inp_url, headers=headers1, timeout=10)
+        print(res.text)
         res.raise_for_status()
         video_id = extract_value(res.text, '"contentData":[{"gist":{"id":"', '",')
         if not video_id:
@@ -120,11 +121,16 @@ def hoichoi_dl(inp_url: str, bot, status):
         response = scraper.get(
             "https://prod-api.viewlift.com/entitlement/video/status",
             params=params,
-            headers=headers
+            headers=headers,
+            timeout=10,
         )
+        print(response.text)
         response.raise_for_status()
         url_data = extract_value(response.text, '"widevine":', "},")
-        value = extract_value(url_data, '"url":"', '"')
+        if not url_data:  
+            value = extract_value(response.text, '"hls":"', '"}}')
+        else:
+            value = extract_value(url_data, '"url":"', '"')
         print(value)
         if not value:
             raise ValueError("Video URL not found!")
