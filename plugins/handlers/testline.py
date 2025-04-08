@@ -58,19 +58,12 @@ def find_strings_from_txt(find_str, file_path, status, bot):
     try:
         start_time = perf_counter()
         # Using subprocess to run grep command with case insensitivity
-        """grep_process = subprocess.Popen(
+        grep_process = subprocess.Popen(
             ["grep", "-i", find_str, file_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             encoding="utf-8",
-        )"""
-        grep_process = subprocess.Popen(
-            ["findstr", "/I", find_str, file_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
         )
-
         output_lines, errors = grep_process.communicate()
         if grep_process.returncode == 0:
             if output_lines:
